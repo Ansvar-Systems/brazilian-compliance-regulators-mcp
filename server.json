@@ -1,0 +1,40 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "eu.ansvar/brazilian-compliance-regulators-mcp",
+  "description": "Query Brazilian compliance regulators: ANPD (data protection), CGU (anti-corruption), COAF (AML), CADE (competition), BACEN (financial), CVM (securities), TCU (audit), SUSEP (insurance)",
+  "repository": {
+    "url": "https://github.com/Ansvar-Systems/brazilian-compliance-regulators-mcp",
+    "source": "github"
+  },
+  "homepage": "https://ansvar.eu",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "keywords": [
+    "brazil",
+    "compliance",
+    "anpd",
+    "lgpd",
+    "bacen",
+    "cvm",
+    "cgu",
+    "coaf",
+    "cade",
+    "tcu",
+    "susep",
+    "financial-regulation",
+    "anti-corruption",
+    "aml",
+    "mcp",
+    "ansvar"
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@ansvar/brazilian-compliance-regulators-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
