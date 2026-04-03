@@ -8,12 +8,14 @@
 # Override with BR_COMPLIANCE_DB_PATH for a custom location.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# --- Stage 1: Build TypeScript ---
+# --- Stage 1: Build TypeScript + native modules ---
 FROM node:20-slim AS builder
+
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN npm ci
 COPY tsconfig.json ./
 COPY src/ src/
 RUN npm run build
@@ -27,6 +29,9 @@ ENV BR_COMPLIANCE_DB_PATH=/app/data/database.db
 
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+
+# Copy the compiled native module from builder (better-sqlite3)
+COPY --from=builder /app/node_modules/better-sqlite3/build /app/node_modules/better-sqlite3/build
 
 COPY --from=builder /app/dist/ dist/
 COPY data/database.db data/database.db
