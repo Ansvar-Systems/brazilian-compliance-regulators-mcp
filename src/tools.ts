@@ -14,6 +14,7 @@ import {
   listTopics,
   getStats,
 } from "./db.js";
+import { buildCitation } from "./citation.js";
 
 export { SERVER_NAME, pkgVersion } from "./constants.js";
 
@@ -237,7 +238,15 @@ export function handleToolCall(
           topic: parsed.topic,
           status: parsed.status,
           limit: parsed.limit,
-        });
+        }).map((r) => ({
+          ...r,
+          _citation: buildCitation(
+            `${r.document_id} Art. ${r.article}`,
+            `${r.document_title} Art. ${r.article}`,
+            "br_comp_get_provision",
+            { document_id: r.document_id, article: r.article },
+          ),
+        }));
         return textContent({ results, count: results.length });
       }
 
@@ -249,7 +258,15 @@ export function handleToolCall(
             `Provision not found: ${parsed.document_id} ${parsed.article}`,
           );
         }
-        return textContent(provision);
+        return textContent({
+          ...provision,
+          _citation: buildCitation(
+            `${parsed.document_id} Art. ${parsed.article}`,
+            `${provision.document_title} Art. ${parsed.article}`,
+            "br_comp_get_provision",
+            { document_id: parsed.document_id, article: parsed.article },
+          ),
+        });
       }
 
       case "br_comp_list_regulators": {
@@ -280,7 +297,15 @@ export function handleToolCall(
           regulator: parsed.regulator,
           penalty_type: parsed.penalty_type,
           limit: parsed.limit,
-        });
+        }).map((e) => ({
+          ...e,
+          _citation: buildCitation(
+            `${e.regulator_id} ${e.case_number || "enforcement"}`,
+            `${e.respondent || "Enforcement action"} (${e.regulator_id})`,
+            "br_comp_search_enforcement",
+            { query: e.respondent || parsed.query },
+          ),
+        }));
         return textContent({ results, count: results.length });
       }
 
