@@ -169,6 +169,10 @@ const insertDocument = db.prepare(`
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
+const deleteProvisions = db.prepare(`
+  DELETE FROM provisions WHERE document_id = ?
+`);
+
 const insertProvision = db.prepare(`
   INSERT INTO provisions (document_id, article, paragraph, text_pt, text_en, topics)
   VALUES (?, ?, ?, ?, ?, ?)
@@ -574,6 +578,13 @@ const bacenDocs: DocDef[] = [
         text_en: "This Circular provides for the policy, procedures, and internal controls to be adopted by institutions authorised to operate by the Central Bank of Brazil aimed at preventing the use of the financial system for the commission of crimes of money laundering or concealment of assets, rights, and values.",
         topics: '["aml","financial_regulation","kyc","compliance_program"]',
       },
+      {
+        article: "art2",
+        paragraph: null,
+        text_pt: "Para os fins desta Circular, a regulação prudencial e a regulação financeira emitidas pelo Banco Central do Brasil estabelecem os parâmetros mínimos para a implementação de políticas de prevenção à lavagem de dinheiro e ao financiamento do terrorismo pelas instituições do sistema financeiro nacional.",
+        text_en: "For the purposes of this Circular, prudential regulation and financial regulation issued by the Central Bank of Brazil establish the minimum parameters for the implementation of anti-money laundering and counter-terrorism financing policies by institutions of the national financial system.",
+        topics: '["aml","financial_regulation","prudential_regulation","compliance_program"]',
+      },
     ],
   },
 ];
@@ -825,6 +836,7 @@ const seedAll = db.transaction(() => {
     );
     docCount++;
 
+    deleteProvisions.run(doc.id);
     for (const prov of doc.provisions) {
       insertProvision.run(
         doc.id,

@@ -256,6 +256,23 @@ export function getRegulatorSummary(
   };
 }
 
+// ─── FTS5 helpers ───────────────────────────────────────────────────────────
+
+/**
+ * Sanitize a user-supplied query for FTS5 MATCH.
+ * Wraps each whitespace-separated token in double-quotes so that FTS5
+ * syntax characters (AND, OR, NOT, NEAR, *, ", (, )) are treated as
+ * literals and don't cause a SQLite parse error.
+ */
+function sanitizeFtsQuery(query: string): string {
+  return query
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((token) => `"${token.replace(/"/g, "")}"`)
+    .join(" ");
+}
+
 // ─── Provision queries ──────────────────────────────────────────────────────
 
 export interface SearchProvisionsOptions {
@@ -271,7 +288,7 @@ export function searchProvisions(opts: SearchProvisionsOptions): Array<Provision
   const limit = opts.limit ?? 20;
 
   const conditions: string[] = [];
-  const params: Record<string, unknown> = { query: opts.query, limit };
+  const params: Record<string, unknown> = { query: sanitizeFtsQuery(opts.query), limit };
 
   if (opts.regulator) {
     conditions.push("d.regulator_id = :regulator");
@@ -352,7 +369,7 @@ export function searchEnforcement(
   const limit = opts.limit ?? 20;
 
   const conditions: string[] = [];
-  const params: Record<string, unknown> = { query: opts.query, limit };
+  const params: Record<string, unknown> = { query: sanitizeFtsQuery(opts.query), limit };
 
   if (opts.regulator) {
     conditions.push("e.regulator_id = :regulator");
