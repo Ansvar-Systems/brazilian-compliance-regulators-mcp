@@ -16,6 +16,7 @@ import {
 } from "./db.js";
 import { buildCitation } from "./citation.js";
 
+import { pkgVersion } from "./constants.js";
 export { SERVER_NAME, pkgVersion } from "./constants.js";
 
 // ─── Tool definitions ────────────────────────────────────────────────────────
@@ -318,7 +319,7 @@ export function handleToolCall(
         const stats = getStats();
         return textContent({
           name: "brazilian-compliance-regulators-mcp",
-          version: "0.1.0",
+          version: pkgVersion,
           description:
             "Brazilian compliance regulators MCP. Covers 8 key regulators: ANPD (data protection/LGPD enforcement), CGU (anti-corruption), COAF (AML/CFT), CADE (competition/antitrust), BACEN (financial regulation/cybersecurity), CVM (securities), TCU (public audit/procurement), SUSEP (insurance). Provides normative acts at provision level with enforcement actions.",
           jurisdiction: "BR",
