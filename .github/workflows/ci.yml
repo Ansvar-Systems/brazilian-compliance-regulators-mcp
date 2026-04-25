@@ -1,0 +1,80 @@
+name: CI
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build database
+        run: |
+          if jq -e '.scripts["build:db"]' package.json >/dev/null 2>&1; then
+            npm run build:db
+          else
+            echo "build:db script not present — skipping (native-curated MCP without DB build step)"
+          fi
+
+      - name: Type check
+        run: |
+          if jq -e '.scripts.typecheck' package.json >/dev/null 2>&1; then
+            npm run typecheck
+          else
+            echo "typecheck script not present — skipping"
+          fi
+
+      - name: Unit tests
+        run: |
+          if jq -e '.scripts.test' package.json >/dev/null 2>&1; then
+            npm test
+          else
+            echo "test script not present — skipping (no unit tests in this MCP)"
+          fi
+
+      - name: Contract tests
+        run: |
+          if jq -e '.scripts["test:contract"]' package.json >/dev/null 2>&1; then
+            npm run test:contract
+          else
+            echo "test:contract script not present — skipping"
+          fi
+
+      - name: Database integrity
+        run: |
+          DB_PATH=$(jq -r '.scripts["build:db"] // empty' package.json | grep -oE 'data/[a-zA-Z0-9_-]+\.db' | head -1)
+          DB_PATH=${DB_PATH:-data/database.db}
+          if [ -f "$DB_PATH" ]; then
+            sqlite3 "$DB_PATH" "PRAGMA integrity_check;" | grep -q "ok"
+            sqlite3 "$DB_PATH" "PRAGMA journal_mode;" | grep -q "delete"
+          else
+            echo "no database file at $DB_PATH — skipping integrity check"
+          fi
+
+      - name: Coverage consistency
+        run: |
+          if jq -e '.scripts["coverage:verify"]' package.json >/dev/null 2>&1; then
+            npm run coverage:verify
+          else
+            echo "coverage:verify script not present — skipping"
+          fi
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high || true

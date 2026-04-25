@@ -2,7 +2,7 @@
   "name": "@ansvar/brazilian-compliance-regulators-mcp",
   "version": "0.1.0",
   "mcpName": "eu.ansvar/brazilian-compliance-regulators-mcp",
-  "description": "Brazilian compliance regulators MCP — ANPD, CGU, COAF, CADE, BACEN, CVM, TCU, SUSEP normative acts, enforcement, and guidance",
+  "description": "Brazilian compliance regulators MCP \u2014 ANPD, CGU, COAF, CADE, BACEN, CVM, TCU, SUSEP normative acts, enforcement, and guidance",
   "type": "module",
   "main": "dist/src/index.js",
   "bin": {
@@ -50,10 +50,10 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/http-server.ts",
     "start": "node dist/src/http-server.js",
-    "ingest": "npx tsx scripts/ingest.ts",
     "seed": "npx tsx scripts/seed-sample.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:contract": "echo \"No contract tests yet\" && exit 0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
